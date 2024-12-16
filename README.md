@@ -1,5 +1,6 @@
 # OneCloud
 An automatic DREDGE save cloud managing with OneDrive.
+!WORK IN PROGRRESS!
 #TUTORIAL/HOW TO USE
 1.Put onecloud.exe in your DREDGE main directory
 2.Now your gonna lunch DREDGE only by using onedrive.exe
