@@ -65,65 +65,74 @@ func main() {
 \____/_//_/\__/\___/_/\___/\_,_/\_,_/  
                                        
 `
-	Author := `
-███ ▀▄    ▄         ▄   ▄█ █▄▄▄▄ █▀▄▀█ ████▄     ▄  
-█  █  █  █           █  ██ █  ▄▀ █ █ █ █   █ ▀▄   █ 
-█ ▀ ▄  ▀█       █     █ ██ █▀▀▌  █ ▄ █ █   █   █ ▀  
-█  ▄▀  █         █    █ ▐█ █  █  █   █ ▀████  ▄ █   
-███  ▄▀           █  █   ▐   █      █        █   ▀▄ 
-                   █▐       ▀      ▀          ▀     
-                   ▐                                
-`
+
 	fmt.Println(Onedrive)
-	fmt.Println(Author)
+	fmt.Println("By Virmox")
 
 	var dstDir string
 	var srcFile string
+	var game string
 
-	dirdata, errReadDir := os.ReadFile("Dredge_save_path.txt")
-	oddata, errReadOd := os.ReadFile("OneDrive_save_path.txt")
-	if errReadDir != nil {
-		fmt.Println("Set your DREDGE folder path: \n(ex. C:/Users/admin/AppData/LocalLow/Black Salt Games/DREDGE)\n")
+	dirdata, errRead := os.ReadFile("Game_save_path.txt")
+	oddata, errRead := os.ReadFile("OneDrive_save_path.txt")
+	gamedata, errRead := os.ReadFile("Game_executable.txt")
+	if errRead != nil {
+		fmt.Println("Set your game's save folder path: \n(ex. C:/Users/admin/AppData/LocalLow/Subnautica/GameSaves)")
 		scanner := bufio.NewScanner(os.Stdin)
 		scanner.Scan()
 		Dpath := scanner.Text()
-		errWrite := os.WriteFile("Dredge_save_path.txt", []byte(Dpath), 0666)
+		errWrite := os.WriteFile("Game_save_path.txt", []byte(Dpath), 0666)
 		if errWrite != nil {
 			log.Fatal(errWrite)
 		}
 		fmt.Print("\033[H\033[2J")
-		fmt.Println("Set your OneDrive folder path: \n(ex. C:/Users/admin/OneDrive/DREDGE)\n")
+		fmt.Println("Put your game's save folder inside OneDrive folder")
+		time.Sleep(time.Second * 2)
+		fmt.Println("Set your OneDrive game's save folder path: \n(ex. C:/Users/admin/OneDrive/Subnautica/GameSaves)")
 		scanner.Scan()
 		Odpath := scanner.Text()
 		errWriteOD := os.WriteFile("OneDrive_save_path.txt", []byte(Odpath), 0666)
 		if errWriteOD != nil {
 			log.Fatal(errWriteOD)
 		}
+		fmt.Print("\033[H\033[2J")
+		fmt.Println("Enter the name of the game's executable: \n(ex. Subnatica.exe)")
+		scanner.Scan()
+		GameExe := scanner.Text()
+		errWriteG := os.WriteFile("Game_executable.txt", []byte(GameExe), 0666)
+		if errWriteG != nil {
+			log.Fatal(errWriteG)
+		}
 		dstDir = Dpath
 		srcFile = Odpath
+		game = GameExe
+		fmt.Print("\033[H\033[2J")
+		fmt.Println("Path set, exiting - reopen the app")
 	} else {
-
+		GameExe := string(gamedata)
 		Dpath := string(dirdata)
 		Odpath := string(oddata)
-		fmt.Println("[1] - Set new DREDGE folder path")
-		fmt.Println("[2] - Set new OneDrive folder path")
-		fmt.Println("[3] - Sync saves and lunch")
+		fmt.Println("[1] - Set new game's save folder path")
+		fmt.Println("[2] - Set new OneDrive save folder path")
+		fmt.Println("[3] - Set new game's executable name")
+		fmt.Println("[4] - Sync saves and lunch")
 		scanner := bufio.NewScanner(os.Stdin)
 		scanner.Scan()
 		option := scanner.Text()
+
 		switch {
 		case option == "1":
 			fmt.Print("\033[H\033[2J")
-			fmt.Println("Enter your new DREDGE folder path:\n(ex. C:/Users/admin/AppData/LocalLow/Black Salt Games/DREDGE)\n")
+			fmt.Println("Enter your new game's save folder path:\n(ex. C:/Users/admin/AppData/LocalLow/Subnatica/GameSaves)")
 			scanner.Scan()
 			dstDir = scanner.Text()
-			errWriteOp1 := os.WriteFile("Dredge_save_path.txt", []byte(dstDir), 0666)
+			errWriteOp1 := os.WriteFile("Game_save_path.txt", []byte(dstDir), 0666)
 			if errWriteOp1 != nil {
 				log.Fatal(errWriteOp1)
 			}
 		case option == "2":
 			fmt.Print("\033[H\033[2J")
-			fmt.Println("Enter your new OneDrive folder path:\n(ex. C:/Users/admin/OneDrive/DREDGE)\n")
+			fmt.Println("Enter your new OneDrive save folder path:\n(ex. C:/Users/admin/OneDrive/Subnautica/GameSaves)")
 			scanner.Scan()
 			dstDir = scanner.Text()
 			errWriteOp2 := os.WriteFile("OneDrive_save_path.txt", []byte(dstDir), 0666)
@@ -133,23 +142,34 @@ func main() {
 			}
 		case option == "3":
 			fmt.Print("\033[H\033[2J")
+			fmt.Println("Enter your new game's executable name:\n(ex. Subnatica.exe)")
+			scanner.Scan()
+			GameExe = scanner.Text()
+			errWriteOp3 := os.WriteFile("Game_executable.txt", []byte(GameExe), 0666)
+			if errWriteOp3 != nil {
+				log.Println(errWriteOp3)
+
+			}
+		case option == "4":
+			fmt.Print("\033[H\033[2J")
 			dstDir = Dpath
 			srcFile = Odpath
+			game = GameExe
 			dstFile := dstDir
-			fmt.Println("Syncing DREDGE saves...")
+			fmt.Println("Syncing game saves...")
 			errcopy := copyFile(srcFile, dstFile)
 			if errcopy != nil {
 				log.Println(errcopy)
 
 			}
-			fmt.Println("Lunching DREDGE...")
-			exePath, err := filepath.Abs("DREDGE.exe")
+			fmt.Println("Lunching game...")
+			exePath, err := filepath.Abs(game)
 			if err != nil {
 				log.Println(err)
 
 			}
-
 			cmd := exec.Command(exePath)
+			fmt.Println("Waiting for game to close...")
 			err = cmd.Run()
 			if err != nil {
 				log.Println(err)
@@ -157,25 +177,23 @@ func main() {
 			}
 
 			fmt.Println("Uploading saves to OneDrive...")
+			time.Sleep(time.Second * 3)
 			errcopy = copyFile(dstFile, srcFile)
 			if errcopy != nil {
 				log.Println(errcopy)
 			}
+			fmt.Println("Done, closing...")
+			time.Sleep(time.Second * 1)
+			os.Exit(0)
 
 		default:
-			log.Println("Invalid option")
+			log.Println("Invalid option. Restart and type a number")
 
 		}
 	}
-	fmt.Print("\033[H\033[2J")
-	fmt.Println("If first use, path set - open app again.\nIf not - closing in 3 seconds")
+
+	fmt.Println("Closing in 3 seconds")
 	time.Sleep(time.Second * 3)
-	fmt.Println("Yes im going to leave that code working like that")
-	time.Sleep(time.Second * 1)
-
+	//bye bye
 	os.Exit(0)
-	if errReadOd != nil {
-		log.Fatal(errReadOd)
-	}
-
 }
